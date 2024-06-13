@@ -24,7 +24,7 @@ services:
     ports:
       - 10001:3567
     environment:
-      MYSQL_CONNECTION_URI: mysql://supertokens_user:somePassword@db:3306/supertokens
+      MYSQL_CONNECTION_URI: mysql://supertokens_user:somePassword@database:3306/supertokens
     networks:
       - app_network
     restart: unless-stopped
@@ -40,12 +40,27 @@ services:
       context: ./frontend
       dockerfile: ../dockerfiles/frontend.Dockerfile
     container_name: supertokens_frontend
+    networks:
+      - app_network
     working_dir: /app
     volumes:
       - ./frontend:/app
     command: ["npm", "run", "start"]
     ports:
       - 10002:3000
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ../dockerfiles/backend.Dockerfile
+    container_name: supertokens_backend
+    networks:
+      - app_network
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    ports:
+      - 10003:5000
 
 networks:
   app_network:
