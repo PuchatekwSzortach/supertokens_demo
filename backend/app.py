@@ -1,59 +1,68 @@
-from supertokens_python import init, InputAppInfo, SupertokensConfig
-from supertokens_python.recipe import emailpassword, session
+import os
 
-import flask
-
+from flask import Flask, abort, g, jsonify
 from flask_cors import CORS
+from supertokens_python import (
+    get_all_cors_headers,
+    init,
+)
 from supertokens_python.framework.flask import Middleware
-from supertokens_python import get_all_cors_headers
-
+from supertokens_python.recipe.session.framework.flask import verify_session
+from supertokens_python.recipe.multitenancy.syncio import list_all_tenants
+import config
 
 init(
-    app_info=InputAppInfo(
-        app_name="supertokens_demo",
-        api_domain="http://localhost:10003",
-        website_domain="http://localhost:10002",
-        api_base_path="/auth",
-        website_base_path="/auth"
-    ),
-    supertokens_config=SupertokensConfig(
-        connection_uri="http://supertokens:3567",
-        # api_key=<API_KEY(if configured)>
-    ),
-    framework='flask',
-    recipe_list=[
-        session.init(), # initializes session features
-        emailpassword.init()
-    ]
+    supertokens_config=config.supertokens_config,
+    app_info=config.app_info,
+    framework=config.framework,
+    recipe_list=config.recipe_list,
 )
 
-app = flask.Flask("supertokens_backend")
+app = Flask(__name__)
+# TODO: should middlware be after or before cors?
 Middleware(app)
-
-
 CORS(
     app=app,
-    origins=[
-        "http://localhost:10002"
-    ],
     supports_credentials=True,
+    origins="http://localhost:10002",
     allow_headers=["Content-Type"] + get_all_cors_headers(),
 )
 
 
+@app.route("/sessioninfo", methods=["GET"])  # type: ignore
+@verify_session()
+def get_session_info():
+    session_ = g.supertokens
+    return jsonify(
+        {
+            "sessionHandle": session_.get_handle(),
+            "userId": session_.get_user_id(),
+            "accessTokenPayload": session_.get_access_token_payload(),
+        }
+    )
+
+@app.route("/tenants", methods=["GET"])  # type: ignore
+def get_tenants():
+    tenantReponse = list_all_tenants()
+
+    tenantsList = []
+
+    for tenant in tenantReponse.tenants:
+        tenantsList.append(tenant.to_json())
+
+    return jsonify({
+        "status": "OK",
+        "tenants": tenantsList,
+    })
+
+
 # This is required since if this is not there, then OPTIONS requests for
 # the APIs exposed by the supertokens' Middleware will return a 404
-@app.route('/', defaults={'u_path': ''})
-@app.route('/<path:u_path>')
-def catch_all(u_path: str):
-    flask.abort(404)
-
-
-@app.route("/home")
-def home():
-    return "Hello, home!"
+@app.route("/", defaults={"u_path": ""})  # type: ignore
+@app.route("/<path:u_path>")  # type: ignore
+def catch_all(u_path: str):  # pylint: disable=unused-argument
+    abort(404)
 
 
 if __name__ == "__main__":
-
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
