@@ -5,13 +5,13 @@ import flask_cors
 
 import supertokens_python
 
-from supertokens_python.framework.flask import Middleware
-from supertokens_python.recipe.session.framework.flask import verify_session
-from supertokens_python.recipe.multitenancy.syncio import list_all_tenants
-
-from supertokens_python.recipe.session import SessionContainer
+import supertokens_python.framework.flask
+import supertokens_python.recipe.multitenancy.syncio
+import supertokens_python.recipe.session
+import supertokens_python.recipe.session.framework.flask
 
 import config
+
 
 supertokens_python.init(
     supertokens_config=config.supertokens_config,
@@ -22,7 +22,7 @@ supertokens_python.init(
 
 app = flask.Flask(__name__)
 # TODO: should middlware be after or before cors?
-Middleware(app)
+supertokens_python.framework.flask.Middleware(app)
 flask_cors.CORS(
     app=app,
     supports_credentials=True,
@@ -32,7 +32,7 @@ flask_cors.CORS(
 
 
 @app.route("/sessioninfo", methods=["GET"])  # type: ignore
-@verify_session()
+@supertokens_python.recipe.session.framework.flask.verify_session()
 def get_session_info():
     session_ = flask.g.supertokens
     return flask.jsonify(
@@ -46,7 +46,7 @@ def get_session_info():
 
 @app.route("/tenants", methods=["GET"])  # type: ignore
 def get_tenants():
-    tenantReponse = list_all_tenants()
+    tenantReponse = supertokens_python.recipe.multitenancy.syncio.list_all_tenants()
 
     tenantsList = []
 
@@ -60,17 +60,17 @@ def get_tenants():
 
 
 @app.route('/update-jwt', methods=['POST'])
-@verify_session()
+@supertokens_python.recipe.session.framework.flask.verify_session()
 def like_comment():
-    session: SessionContainer = flask.g.supertokens
+    session: supertokens_python.recipe.session.SessionContainer = flask.g.supertokens
 
     _ = session.get_user_id()
 
 
 @app.route('/user-info', methods=['GET'])
-@verify_session()
+@supertokens_python.recipe.session.framework.flask.verify_session()
 def get_user_info():
-    session: SessionContainer = flask.g.supertokens
+    session: supertokens_python.recipe.session.SessionContainer = flask.g.supertokens
 
     import icecream
     icecream.ic(session)
