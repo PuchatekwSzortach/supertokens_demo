@@ -11,6 +11,8 @@ export const SuperTokensConfig = {
     EmailPassword.init({
       useShadowDom: false,
     }),
-    Session.init(),
+    Session.init({
+      tokenTransferMethod: "header"
+    }),
   ],
 };
