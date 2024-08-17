@@ -44,6 +44,19 @@ def get_session_info():
     )
 
 
+@app.route('/user-info', methods=['GET'])
+@supertokens_python.recipe.session.framework.flask.verify_session()
+def get_user_info():
+
+    session: supertokens_python.recipe.session.SessionContainer = flask.g.supertokens
+
+    return flask.jsonify({
+        "data": "nothing here yet",
+        "userId": session.get_user_id()
+    })
+
+
+
 @app.route("/tenants", methods=["GET"])  # type: ignore
 def get_tenants():
     tenantReponse = supertokens_python.recipe.multitenancy.syncio.list_all_tenants()
@@ -66,18 +79,6 @@ def like_comment():
 
     _ = session.get_user_id()
 
-
-@app.route('/user-info', methods=['GET'])
-@supertokens_python.recipe.session.framework.flask.verify_session()
-def get_user_info():
-    session: supertokens_python.recipe.session.SessionContainer = flask.g.supertokens
-
-    import icecream
-    icecream.ic(session)
-
-    return flask.jsonify({
-        "data": "nothing here yet"
-    })
 
 # This is required since if this is not there, then OPTIONS requests for
 # the APIs exposed by the supertokens' Middleware will return a 404
