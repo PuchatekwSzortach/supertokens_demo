@@ -1,39 +1,41 @@
 import os
 
-from flask import Flask, abort, g, jsonify
-from flask_cors import CORS
-from supertokens_python import (
-    get_all_cors_headers,
-    init,
-)
-from supertokens_python.framework.flask import Middleware
-from supertokens_python.recipe.session.framework.flask import verify_session
-from supertokens_python.recipe.multitenancy.syncio import list_all_tenants
+import flask
+import flask_cors
+
+import supertokens_python
+
+import supertokens_python.framework.flask
+import supertokens_python.recipe.multitenancy.syncio
+import supertokens_python.recipe.session
+import supertokens_python.recipe.session.framework.flask
+
 import config
 
-init(
+
+supertokens_python.init(
     supertokens_config=config.supertokens_config,
     app_info=config.app_info,
     framework=config.framework,
     recipe_list=config.recipe_list,
 )
 
-app = Flask(__name__)
+app = flask.Flask(__name__)
 # TODO: should middlware be after or before cors?
-Middleware(app)
-CORS(
+supertokens_python.framework.flask.Middleware(app)
+flask_cors.CORS(
     app=app,
     supports_credentials=True,
     origins="http://localhost:10002",
-    allow_headers=["Content-Type"] + get_all_cors_headers(),
+    allow_headers=["Content-Type"] + supertokens_python.get_all_cors_headers(),
 )
 
 
 @app.route("/sessioninfo", methods=["GET"])  # type: ignore
-@verify_session()
+@supertokens_python.recipe.session.framework.flask.verify_session()
 def get_session_info():
-    session_ = g.supertokens
-    return jsonify(
+    session_ = flask.g.supertokens
+    return flask.jsonify(
         {
             "sessionHandle": session_.get_handle(),
             "userId": session_.get_user_id(),
@@ -41,19 +43,41 @@ def get_session_info():
         }
     )
 
+
+@app.route('/user-info', methods=['GET'])
+@supertokens_python.recipe.session.framework.flask.verify_session()
+def get_user_info():
+
+    session: supertokens_python.recipe.session.SessionContainer = flask.g.supertokens
+
+    return flask.jsonify({
+        "data": "nothing here yet",
+        "userId": session.get_user_id()
+    })
+
+
+
 @app.route("/tenants", methods=["GET"])  # type: ignore
 def get_tenants():
-    tenantReponse = list_all_tenants()
+    tenantReponse = supertokens_python.recipe.multitenancy.syncio.list_all_tenants()
 
     tenantsList = []
 
     for tenant in tenantReponse.tenants:
         tenantsList.append(tenant.to_json())
 
-    return jsonify({
+    return flask.jsonify({
         "status": "OK",
         "tenants": tenantsList,
     })
+
+
+@app.route('/update-jwt', methods=['POST'])
+@supertokens_python.recipe.session.framework.flask.verify_session()
+def like_comment():
+    session: supertokens_python.recipe.session.SessionContainer = flask.g.supertokens
+
+    _ = session.get_user_id()
 
 
 # This is required since if this is not there, then OPTIONS requests for
@@ -61,7 +85,8 @@ def get_tenants():
 @app.route("/", defaults={"u_path": ""})  # type: ignore
 @app.route("/<path:u_path>")  # type: ignore
 def catch_all(u_path: str):  # pylint: disable=unused-argument
-    abort(404)
+    flask.abort(404)
+
 
 
 if __name__ == "__main__":

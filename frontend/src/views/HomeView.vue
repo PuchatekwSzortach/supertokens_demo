@@ -36,7 +36,7 @@ export default defineComponent({
       <h1>Hello</h1>
 
       <div v-if="session">
-        <span>UserId:</span>
+        <span>UserId or some other info:</span>
         <h3>{{ userId }}</h3>
 
         <button @click="onLogout">Sign Out</button>

@@ -4,13 +4,16 @@ import Session from "supertokens-auth-react/recipe/session";
 export const SuperTokensConfig = {
   appInfo: {
     appName: "SuperTokens Demo App",
-    apiDomain: "http://localhost:10003",
+    // apiDomain: "http://localhost:10003",
+    apiDomain: "http://localhost:10010",
     websiteDomain: "http://localhost:10002",
   },
   recipeList: [
     EmailPassword.init({
       useShadowDom: false,
     }),
-    Session.init(),
+    Session.init({
+      tokenTransferMethod: "header"
+    }),
   ],
 };
