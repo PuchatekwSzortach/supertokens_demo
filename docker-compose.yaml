@@ -19,6 +19,7 @@ services:
 
   supertokens:
     image: registry.supertokens.io/supertokens/supertokens-mysql:9.1.2
+    container_name: supertokens_core
     depends_on:
       database:
         condition: service_healthy
