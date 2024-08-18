@@ -1,6 +1,7 @@
 services:
   database:
     image: mysql:8.4.0
+    container_name: supertokens_database
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: supertokens_user
@@ -58,6 +59,7 @@ services:
     working_dir: /app
     volumes:
       - ./backend:/app
+      - ./configurations:/configurations
     ports:
       - 10003:5000
 
