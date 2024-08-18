@@ -4,29 +4,13 @@ Invoke commands to be run inside the backend container
 
 import invoke
 
+import net.invoke.sundry
+import net.invoke.tests
 
-@invoke.task
-def clean_state(_context, config_path):
-    """
-    Command to clean system state
 
-    Args:
-        _context (invoke.Context): context instance
-        config_path: path to configuration file
-    """
+# Default invoke collection
+ns = invoke.Collection()
 
-    import mysql.connector
-
-    import utilities
-
-    config = utilities.load_config(config_path)
-
-    mysql_connection = mysql.connector.connect(
-        host=config.database.docker_network.host,
-        port=config.database.docker_network.port,
-        user=config.database.username,
-        password=config.database.password,
-        database=config.database.supertokens_database
-    )
-
-    utilities.truncate_mysql_tables(mysql_connection)
+# Add collections defined in other files
+ns.add_collection(net.invoke.sundry)
+ns.add_collection(net.invoke.tests)

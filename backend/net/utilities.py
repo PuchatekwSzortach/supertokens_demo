@@ -14,7 +14,7 @@ def load_config(config_path: str) -> box.Box:
     :param config_path: path to configuration file
     :return: configuration as a box object
     """
-    with open(config_path, 'r') as file:
+    with open(config_path, mode='r', encoding="utf-8") as file:
         config = yaml.safe_load(file)
 
     return box.Box(config)
