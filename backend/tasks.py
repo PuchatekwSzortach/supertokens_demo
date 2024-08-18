@@ -21,7 +21,6 @@ def clean_state(_context, config_path):
 
     config = utilities.load_config(config_path)
 
-    # Retrieve all table names from database
     mysql_connection = mysql.connector.connect(
         host=config.database.docker_network.host,
         port=config.database.docker_network.port,

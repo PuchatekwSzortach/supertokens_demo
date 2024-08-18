@@ -40,7 +40,7 @@ def truncate_mysql_tables(connection: mysql.connector.connection.MySQLConnection
         # Fetch all table names
         tables = cursor.fetchall()
 
-        # Print the table names
+        # Truncate each table
         for table in tables:
 
             table_name = table[0]
