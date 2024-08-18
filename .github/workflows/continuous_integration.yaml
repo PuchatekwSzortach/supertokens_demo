@@ -1,0 +1,10 @@
+name: Continuous integration
+on: [push]
+
+jobs:
+    run_commit_stage:
+      runs-on: ubuntu-20.04
+      steps:
+        - uses: actions/checkout@v2
+        - name: run backend tests
+          run: docker compose run --rm backend invoke tests.commit-stage
