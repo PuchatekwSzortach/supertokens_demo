@@ -1,7 +1,18 @@
+""""
+Invoke commands to be run from the host
+"""
+
 import invoke
+
 
 @invoke.task
 def login_flow(_context):
+    """
+    Command calling server with a few basic authentication requests
+
+    Args:
+        _context (invoke.Context): context instance
+    """
 
     import icecream
     import requests

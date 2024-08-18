@@ -1,0 +1,15 @@
+database:
+  host_network:
+    host: localhost
+    port: 10000
+
+  docker_network:
+    host: supertokens_database
+    port: 3306
+
+  # This is a local-only system for playing with stuff,
+  # so I'm not going to bother with a real password management
+  username: root
+  password: root
+
+  supertokens_database: supertokens
