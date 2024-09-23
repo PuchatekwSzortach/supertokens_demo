@@ -19,7 +19,7 @@ def clean_state(_context, config_path):
 
     import net.utilities
 
-    config = net.utilities.load_config(config_path)
+    config = net.utilities.get_config(config_path)
 
     mysql_connection = mysql.connector.connect(
         host=config.database.docker_network.host,

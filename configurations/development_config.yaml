@@ -13,3 +13,14 @@ database:
   password: root
 
   supertokens_database: supertokens
+
+supertokens_core:
+
+  host_network:
+    host: localhost
+    port: 10001
+
+  docker_network:
+    host: supertokenscore
+    port: 3567
+    url:  http://${supertokens_core.docker_network.host}:${supertokens_core.docker_network.port}
