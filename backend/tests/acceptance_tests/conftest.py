@@ -43,13 +43,9 @@ def wait_on_supertokens_core(session_scoped_test_config):
 
         is_ready = False
 
-        import icecream
-
         while is_ready is False:
 
             time.sleep(0.1)
-
-            icecream.ic(session_scoped_test_config.supertokens_core.docker_network.url)
 
             try:
                 response = requests.get(
