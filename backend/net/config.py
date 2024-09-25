@@ -1,3 +1,7 @@
+""""
+Configuration module for the Supertokens backend.
+"""
+
 from supertokens_python.recipe import emailpassword, session, dashboard
 from supertokens_python import (
     InputAppInfo,

@@ -1,7 +1,8 @@
-import os
+"""
+Routes definitions
+"""
 
 import flask
-import flask_cors
 
 import supertokens_python
 
@@ -10,30 +11,16 @@ import supertokens_python.recipe.multitenancy.syncio
 import supertokens_python.recipe.session
 import supertokens_python.recipe.session.framework.flask
 
-import config
+
+BLUEPRINT = flask.Blueprint("net", __name__)
 
 
-supertokens_python.init(
-    supertokens_config=config.supertokens_config,
-    app_info=config.app_info,
-    framework=config.framework,
-    recipe_list=config.recipe_list,
-)
-
-app = flask.Flask(__name__)
-# TODO: should middlware be after or before cors?
-supertokens_python.framework.flask.Middleware(app)
-flask_cors.CORS(
-    app=app,
-    supports_credentials=True,
-    origins="http://localhost:10002",
-    allow_headers=["Content-Type"] + supertokens_python.get_all_cors_headers(),
-)
-
-
-@app.route("/sessioninfo", methods=["GET"])  # type: ignore
+@BLUEPRINT.route("/sessioninfo", methods=["GET"])  # type: ignore
 @supertokens_python.recipe.session.framework.flask.verify_session()
 def get_session_info():
+    """
+    Endpoint for getting session information
+    """
     session_ = flask.g.supertokens
     return flask.jsonify(
         {
@@ -44,9 +31,12 @@ def get_session_info():
     )
 
 
-@app.route('/user-info', methods=['GET'])
+@BLUEPRINT.route('/user-info', methods=['GET'])
 @supertokens_python.recipe.session.framework.flask.verify_session()
 def get_user_info():
+    """
+    Endpoint for getting user info
+    """
 
     session: supertokens_python.recipe.session.SessionContainer = flask.g.supertokens
 
@@ -56,9 +46,12 @@ def get_user_info():
     })
 
 
-
-@app.route("/tenants", methods=["GET"])  # type: ignore
+@BLUEPRINT.route("/tenants", methods=["GET"])  # type: ignore
 def get_tenants():
+    """
+    Endpoint for getting all tenants
+    """
+
     tenantReponse = supertokens_python.recipe.multitenancy.syncio.list_all_tenants()
 
     tenantsList = []
@@ -72,22 +65,12 @@ def get_tenants():
     })
 
 
-@app.route('/update-jwt', methods=['POST'])
-@supertokens_python.recipe.session.framework.flask.verify_session()
-def like_comment():
-    session: supertokens_python.recipe.session.SessionContainer = flask.g.supertokens
-
-    _ = session.get_user_id()
-
-
 # This is required since if this is not there, then OPTIONS requests for
 # the APIs exposed by the supertokens' Middleware will return a 404
-@app.route("/", defaults={"u_path": ""})  # type: ignore
-@app.route("/<path:u_path>")  # type: ignore
+@BLUEPRINT.route("/", defaults={"u_path": ""})  # type: ignore
+@BLUEPRINT.route("/<path:u_path>")  # type: ignore
 def catch_all(u_path: str):  # pylint: disable=unused-argument
+    """
+    Catch all route returning 404
+    """
     flask.abort(404)
-
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)

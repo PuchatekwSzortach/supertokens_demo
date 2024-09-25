@@ -7,4 +7,4 @@ jobs:
       steps:
         - uses: actions/checkout@v2
         - name: run backend tests
-          run: docker compose run --rm backend invoke tests.commit-stage
+          run: docker compose up --build -d && docker compose run --rm backend invoke tests.commit-stage

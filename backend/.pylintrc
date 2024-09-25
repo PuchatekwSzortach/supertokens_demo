@@ -77,7 +77,10 @@ disable=raw-checker-failed,
         # Unfortunately pylint has problems analyzing tensorflow code properly
         unexpected-keyword-arg,
         unnecessary-comprehension,
-        consider-using-f-string
+        consider-using-f-string,
+        redefined-outer-name,
+        invalid-name,
+        fixme
 
 
 # Enable the message, report, category or checker with the given id(s). You can

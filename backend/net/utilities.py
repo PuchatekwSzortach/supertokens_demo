@@ -4,19 +4,18 @@ Module with utilities
 
 import box
 import mysql.connector
-import yaml
+import omegaconf
 
 
-def load_config(config_path: str) -> box.Box:
+def get_config(config_path: str) -> box.Box:
     """
     Load configuration file
 
     :param config_path: path to configuration file
     :return: configuration as a box object
     """
-    with open(config_path, mode='r', encoding="utf-8") as file:
-        config = yaml.safe_load(file)
 
+    config = omegaconf.OmegaConf.load(config_path)
     return box.Box(config)
 
 

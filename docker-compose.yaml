@@ -19,7 +19,7 @@ services:
 
   supertokens:
     image: registry.supertokens.io/supertokens/supertokens-mysql:9.1.2
-    container_name: supertokens_core
+    container_name: supertokenscore
     depends_on:
       database:
         condition: service_healthy
@@ -30,25 +30,20 @@ services:
     networks:
       - app_network
     restart: unless-stopped
-    healthcheck:
-      test: >
-        bash -c 'exec 3<>/dev/tcp/127.0.0.1/3567 && echo -e "GET /hello HTTP/1.1\r\nhost: 127.0.0.1:3567\r\nConnection: close\r\n\r\n" >&3 && cat <&3 | grep "Hello"'
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   frontend:
-    image: supertokens_frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: ../dockerfiles/frontend.Dockerfile
+    command: ["npm", "run", "dev"]
     container_name: supertokens_frontend
-
     networks:
       - app_network
+    ports:
+      - 10002:3000
     working_dir: /app
     volumes:
       - ./frontend:/app
-    command: ["npm", "run", "dev"]
-    ports:
-      - 10002:3000
 
   backend:
     build:
@@ -57,12 +52,12 @@ services:
     container_name: supertokens_backend
     networks:
       - app_network
+    ports:
+      - 10003:5000
     working_dir: /app
     volumes:
       - ./backend:/app
       - ./configurations:/configurations
-    ports:
-      - 10003:5000
 
 networks:
   app_network:
