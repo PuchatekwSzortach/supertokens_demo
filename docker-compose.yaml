@@ -32,17 +32,18 @@ services:
     restart: unless-stopped
 
   frontend:
-    image: supertokens_frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: ../dockerfiles/frontend.Dockerfile
+    command: ["npm", "run", "dev"]
     container_name: supertokens_frontend
-
     networks:
       - app_network
+    ports:
+      - 10002:3000
     working_dir: /app
     volumes:
       - ./frontend:/app
-    command: ["npm", "run", "dev"]
-    ports:
-      - 10002:3000
 
   backend:
     build:
@@ -51,12 +52,12 @@ services:
     container_name: supertokens_backend
     networks:
       - app_network
+    ports:
+      - 10003:5000
     working_dir: /app
     volumes:
       - ./backend:/app
       - ./configurations:/configurations
-    ports:
-      - 10003:5000
 
 networks:
   app_network:
